@@ -1,0 +1,5 @@
+# Python tooling for the PULSE CALC reference engine.
+#
+#   python -m pip install -r python/requirements.txt
+#
+pytest>=8.0

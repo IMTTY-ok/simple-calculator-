@@ -1,0 +1,293 @@
+{
+  "$comment": "Shared behaviour contract for the PULSE CALC engines. Both the TypeScript engine and the Python reference engine are driven by these key sequences and must produce identical displays. Key vocabulary: 0-9, + - x / . % +/- AC C backspace = (using the glyphs +, -, ×, ÷, ., %, ±, AC, C, ⌫, =).",
+  "cases": [
+    {
+      "id": "add-simple",
+      "description": "2 + 3 = 5",
+      "keys": ["2", "+", "3", "="],
+      "expected": { "expression": "2 + 3 =", "value": "5", "preview": null, "error": null }
+    },
+    {
+      "id": "subtract-simple",
+      "description": "9 - 4 = 5",
+      "keys": ["9", "-", "4", "="],
+      "expected": { "expression": "9 − 4 =", "value": "5", "preview": null, "error": null }
+    },
+    {
+      "id": "multiply-simple",
+      "description": "6 × 7 = 42",
+      "keys": ["6", "×", "7", "="],
+      "expected": { "expression": "6 × 7 =", "value": "42", "preview": null, "error": null }
+    },
+    {
+      "id": "divide-simple",
+      "description": "9 ÷ 2 = 4.5",
+      "keys": ["9", "÷", "2", "="],
+      "expected": { "expression": "9 ÷ 2 =", "value": "4.5", "preview": null, "error": null }
+    },
+    {
+      "id": "precedence-multiply-first",
+      "description": "2 + 3 × 4 = 14 (multiplication before addition)",
+      "keys": ["2", "+", "3", "×", "4", "="],
+      "expected": { "expression": "2 + 3 × 4 =", "value": "14", "preview": null, "error": null }
+    },
+    {
+      "id": "precedence-left-to-right",
+      "description": "2 × 3 + 4 = 10",
+      "keys": ["2", "×", "3", "+", "4", "="],
+      "expected": { "expression": "2 × 3 + 4 =", "value": "10", "preview": null, "error": null }
+    },
+    {
+      "id": "percent-additive",
+      "description": "200 + 10% = 220 (percentage of the accumulated value)",
+      "keys": ["2", "0", "0", "+", "1", "0", "%", "="],
+      "expected": { "expression": "200 + 10% =", "value": "220", "preview": null, "error": null }
+    },
+    {
+      "id": "percent-subtractive",
+      "description": "200 - 10% = 180",
+      "keys": ["2", "0", "0", "-", "1", "0", "%", "="],
+      "expected": { "expression": "200 − 10% =", "value": "180", "preview": null, "error": null }
+    },
+    {
+      "id": "percent-multiplicative",
+      "description": "200 × 10% = 20 (percentage relative to 100)",
+      "keys": ["2", "0", "0", "×", "1", "0", "%", "="],
+      "expected": { "expression": "200 × 10% =", "value": "20", "preview": null, "error": null }
+    },
+    {
+      "id": "percent-alone",
+      "description": "50% = 0.5",
+      "keys": ["5", "0", "%", "="],
+      "expected": { "expression": "50% =", "value": "0.5", "preview": null, "error": null }
+    },
+    {
+      "id": "percent-preview-before-equals",
+      "description": "200 + 10% shows the live result 220 before = is pressed",
+      "keys": ["2", "0", "0", "+", "1", "0", "%"],
+      "expected": { "expression": "200 + 10%", "value": "220", "preview": null, "error": null }
+    },
+    {
+      "id": "live-preview-while-typing",
+      "description": "2 + 3 shows a live preview of 5 while the 3 is being typed",
+      "keys": ["2", "+", "3"],
+      "expected": { "expression": "2 + 3", "value": "3", "preview": "= 5", "error": null }
+    },
+    {
+      "id": "running-total-after-operator",
+      "description": "2 + 3 + shows the running total 5",
+      "keys": ["2", "+", "3", "+"],
+      "expected": { "expression": "2 + 3 +", "value": "5", "preview": null, "error": null }
+    },
+    {
+      "id": "decimal-entry",
+      "description": "0.5 + 0.25 = 0.75",
+      "keys": ["0", ".", "5", "+", "0", ".", "2", "5", "="],
+      "expected": { "expression": "0.5 + 0.25 =", "value": "0.75", "preview": null, "error": null }
+    },
+    {
+      "id": "decimal-repeated-dot-ignored",
+      "description": "1.2.3 keeps only the first decimal point",
+      "keys": ["1", ".", "2", ".", "3"],
+      "expected": { "expression": "1.23", "value": "1.23", "preview": null, "error": null }
+    },
+    {
+      "id": "float-noise-cleaned",
+      "description": "0.1 + 0.2 = 0.3 with no floating-point noise",
+      "keys": ["0", ".", "1", "+", "0", ".", "2", "="],
+      "expected": { "expression": "0.1 + 0.2 =", "value": "0.3", "preview": null, "error": null }
+    },
+    {
+      "id": "repeating-decimal",
+      "description": "1 ÷ 3 = 0.333333333333",
+      "keys": ["1", "÷", "3", "="],
+      "expected": {
+        "expression": "1 ÷ 3 =",
+        "value": "0.333333333333",
+        "preview": null,
+        "error": null
+      }
+    },
+    {
+      "id": "negative-result",
+      "description": "5 − 8 = −3",
+      "keys": ["5", "-", "8", "="],
+      "expected": { "expression": "5 − 8 =", "value": "−3", "preview": null, "error": null }
+    },
+    {
+      "id": "toggle-sign-entry",
+      "description": "± negates the number being typed",
+      "keys": ["5", "±"],
+      "expected": { "expression": "−5", "value": "−5", "preview": null, "error": null }
+    },
+    {
+      "id": "toggle-sign-result",
+      "description": "± negates a completed result",
+      "keys": ["5", "-", "8", "=", "±"],
+      "expected": { "expression": "5 − 8 =", "value": "3", "preview": null, "error": null }
+    },
+    {
+      "id": "negative-operand-multiplication",
+      "description": "−5 × 3 = −15",
+      "keys": ["5", "±", "×", "3", "="],
+      "expected": { "expression": "−5 × 3 =", "value": "−15", "preview": null, "error": null }
+    },
+    {
+      "id": "operator-replaces-pending",
+      "description": "2 + × 3 = 6 — the second operator replaces the pending one",
+      "keys": ["2", "+", "×", "3", "="],
+      "expected": { "expression": "2 × 3 =", "value": "6", "preview": null, "error": null }
+    },
+    {
+      "id": "repeated-equals-addition",
+      "description": "2 + 3 = 5, then = repeats the last operation to give 8",
+      "keys": ["2", "+", "3", "=", "="],
+      "expected": { "expression": "5 + 3 =", "value": "8", "preview": null, "error": null }
+    },
+    {
+      "id": "repeated-equals-twice",
+      "description": "2 + 3 = = = keeps repeating the addition",
+      "keys": ["2", "+", "3", "=", "=", "="],
+      "expected": { "expression": "8 + 3 =", "value": "11", "preview": null, "error": null }
+    },
+    {
+      "id": "repeated-equals-multiplication",
+      "description": "1 + 2 × 3 = 7, then = repeats the multiplication to give 21",
+      "keys": ["1", "+", "2", "×", "3", "=", "="],
+      "expected": { "expression": "7 × 3 =", "value": "21", "preview": null, "error": null }
+    },
+    {
+      "id": "repeated-equals-with-percent",
+      "description": "200 + 10% = 220, then = gives 220 + 10% of 220 = 242",
+      "keys": ["2", "0", "0", "+", "1", "0", "%", "=", "="],
+      "expected": { "expression": "220 + 10% =", "value": "242", "preview": null, "error": null }
+    },
+    {
+      "id": "backspace-entry",
+      "description": "⌫ removes the last typed digit",
+      "keys": ["1", "2", "3", "⌫"],
+      "expected": { "expression": "12", "value": "12", "preview": null, "error": null }
+    },
+    {
+      "id": "backspace-removes-percent",
+      "description": "⌫ removes a trailing percentage",
+      "keys": ["2", "0", "0", "+", "1", "0", "%", "⌫"],
+      "expected": { "expression": "200 + 10", "value": "210", "preview": null, "error": null }
+    },
+    {
+      "id": "clear-entry",
+      "description": "C clears the number being typed",
+      "keys": ["1", "2", "3", "C"],
+      "expected": { "expression": "", "value": "0", "preview": null, "error": null }
+    },
+    {
+      "id": "clear-entry-keeps-expression",
+      "description": "C clears only the current entry, not the whole expression",
+      "keys": ["1", "2", "+", "3", "C"],
+      "expected": { "expression": "12 +", "value": "12", "preview": null, "error": null }
+    },
+    {
+      "id": "clear-all",
+      "description": "AC wipes everything",
+      "keys": ["1", "+", "2", "AC"],
+      "expected": { "expression": "", "value": "0", "preview": null, "error": null }
+    },
+    {
+      "id": "divide-by-zero",
+      "description": "5 ÷ 0 reports an error",
+      "keys": ["5", "÷", "0", "="],
+      "expected": {
+        "expression": "Cannot divide by zero",
+        "value": "Error",
+        "preview": null,
+        "error": "divide-by-zero"
+      }
+    },
+    {
+      "id": "divide-by-zero-live",
+      "description": "5 ÷ 0 reports an error while typing too",
+      "keys": ["5", "÷", "0"],
+      "expected": {
+        "expression": "5 ÷ 0",
+        "value": "Error",
+        "preview": null,
+        "error": "divide-by-zero"
+      }
+    },
+    {
+      "id": "recovers-after-error",
+      "description": "Typing after an error starts a fresh calculation",
+      "keys": ["5", "÷", "0", "=", "7", "+", "3", "="],
+      "expected": { "expression": "7 + 3 =", "value": "10", "preview": null, "error": null }
+    },
+    {
+      "id": "large-integer",
+      "description": "Large integers stay exact and are grouped for readability",
+      "keys": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "1", "2", "3", "4", "5", "+", "1", "="],
+      "expected": {
+        "expression": "123,456,789,012,345 + 1 =",
+        "value": "123,456,789,012,346",
+        "preview": null,
+        "error": null
+      }
+    },
+    {
+      "id": "very-small-number",
+      "description": "Very small numbers use exponential notation",
+      "keys": ["0", ".", "0", "0", "0", "0", "0", "0", "1", "×", "1", "="],
+      "expected": { "expression": "1e−7 × 1 =", "value": "1e−7", "preview": null, "error": null }
+    },
+    {
+      "id": "very-large-number",
+      "description": "Very large numbers use exponential notation (1e15 × 1e6 = 1e21)",
+      "keys": ["1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "×", "1", "0", "0", "0", "0", "0", "0", "="],
+      "expected": {
+        "expression": "1,000,000,000,000,000 × 1,000,000 =",
+        "value": "1e+21",
+        "preview": null,
+        "error": null
+      }
+    },
+    {
+      "id": "thousands-separator",
+      "description": "Large numbers are grouped for readability",
+      "keys": ["1", "2", "3", "4", "5", "6", "7", "8"],
+      "expected": { "expression": "12,345,678", "value": "12,345,678", "preview": null, "error": null }
+    },
+    {
+      "id": "digit-after-percent-starts-fresh",
+      "description": "A percentage closes the expression, so the next digit starts a new one",
+      "keys": ["2", "0", "0", "+", "1", "0", "%", "5", "="],
+      "expected": { "expression": "5 =", "value": "5", "preview": null, "error": null }
+    },
+    {
+      "id": "digit-after-equals-starts-fresh",
+      "description": "A digit after = starts a new calculation",
+      "keys": ["2", "+", "3", "=", "7", "+", "1", "="],
+      "expected": { "expression": "7 + 1 =", "value": "8", "preview": null, "error": null }
+    },
+    {
+      "id": "operator-after-equals-continues",
+      "description": "An operator after = continues from the result",
+      "keys": ["2", "+", "3", "=", "+", "4", "="],
+      "expected": { "expression": "5 + 4 =", "value": "9", "preview": null, "error": null }
+    },
+    {
+      "id": "chained-subtraction",
+      "description": "10 - 3 - 2 = 5",
+      "keys": ["1", "0", "-", "3", "-", "2", "="],
+      "expected": { "expression": "10 − 3 − 2 =", "value": "5", "preview": null, "error": null }
+    },
+    {
+      "id": "long-expression",
+      "description": "A long mixed expression evaluates correctly",
+      "keys": ["1", "2", "×", "3", "+", "4", "×", "5", "-", "6", "÷", "2", "="],
+      "expected": {
+        "expression": "12 × 3 + 4 × 5 − 6 ÷ 2 =",
+        "value": "53",
+        "preview": null,
+        "error": null
+      }
+    }
+  ]
+}

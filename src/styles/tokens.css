@@ -1,0 +1,138 @@
+/*
+ * PULSE CALC — design tokens
+ * ---------------------------------------------------------------------------
+ * A single source of truth for colour, depth, motion and typography.
+ * Components never hard-code a colour; they reference these semantic tokens so
+ * the light/dark themes stay perfectly in sync.
+ *
+ * Art direction: "instrument". Warm graphite surfaces, bone-white type, and a
+ * single restrained signal-orange accent reserved for the primary action.
+ */
+
+:root {
+  /* Typography ------------------------------------------------------- */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace,
+    'SF Mono', Menlo, Consolas, monospace;
+
+  /* Motion ----------------------------------------------------------- */
+  /* Strong ease-out for UI interactions (Emil Kowalski's recommended curve) */
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --dur-press: 120ms;
+  --dur-quick: 160ms;
+  --dur-panel: 220ms;
+  --dur-theme: 260ms;
+
+  /* Geometry --------------------------------------------------------- */
+  --radius-key: 18px;
+  --radius-key-sm: 14px;
+  --radius-card: 30px;
+  --radius-chip: 999px;
+
+  /* Layout ----------------------------------------------------------- */
+  --calc-width: 412px;
+  --header-height: 60px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Dark theme (default)
+ * ------------------------------------------------------------------------ */
+:root,
+.dark {
+  color-scheme: dark;
+
+  --pc-bg: #0a0b0d;
+  --pc-bg-veil: #0e1013;
+  --pc-surface: #16191d;
+  --pc-surface-2: #1c2025;
+  --pc-surface-3: #22262c;
+
+  --pc-key: #242830;
+  --pc-key-hover: #2d323a;
+  --pc-key-active: #171a1e;
+  --pc-key-fn: #1b1e23;
+  --pc-key-fn-hover: #252a31;
+
+  --pc-border: #2b3038;
+  --pc-border-strong: #39404a;
+
+  --pc-text: #eef1f5;
+  --pc-text-muted: #8b929c;
+  --pc-text-dim: #7b828c;
+
+  --pc-accent: #ff7a3d;
+  --pc-accent-hover: #ff8b53;
+  --pc-accent-contrast: #0a0b0d;
+  --pc-accent-strong: #ff8b53;
+  --pc-accent-soft: rgb(255 122 61 / 14%);
+  --pc-accent-ring: rgb(255 122 61 / 45%);
+
+  --pc-danger: #ff6b60;
+  --pc-danger-soft: rgb(255 107 96 / 14%);
+
+  --pc-ring: #8ea0ff;
+  --pc-ring-soft: rgb(142 160 255 / 40%);
+
+  --pc-key-shadow:
+    0 1px 0 rgb(255 255 255 / 5%) inset, 0 2px 6px rgb(0 0 0 / 32%);
+  --pc-key-shadow-active:
+    0 1px 0 rgb(255 255 255 / 3%) inset, 0 1px 2px rgb(0 0 0 / 40%);
+  --pc-card-shadow:
+    0 32px 80px -32px rgb(0 0 0 / 85%),
+    0 1px 0 rgb(255 255 255 / 6%) inset;
+  --pc-panel-shadow: 0 24px 60px -24px rgb(0 0 0 / 80%);
+  --pc-hairline: rgb(255 255 255 / 6%);
+}
+
+/* ---------------------------------------------------------------------------
+ * Light theme
+ * ------------------------------------------------------------------------ */
+.light {
+  color-scheme: light;
+
+  --pc-bg: #edeae4;
+  --pc-bg-veil: #e5e1d9;
+  --pc-surface: #fbf9f5;
+  --pc-surface-2: #ffffff;
+  --pc-surface-3: #f4f1ea;
+
+  --pc-key: #ffffff;
+  --pc-key-hover: #f2efe8;
+  --pc-key-active: #eae6dd;
+  --pc-key-fn: #e7e3da;
+  --pc-key-fn-hover: #dcd7cc;
+
+  --pc-border: #ddd8cf;
+  --pc-border-strong: #c7c1b5;
+
+  --pc-text: #14161a;
+  --pc-text-muted: #5a6069;
+  --pc-text-dim: #6a7078;
+
+  --pc-accent: #f2672e;
+  --pc-accent-hover: #ff7538;
+  --pc-accent-contrast: #14161a;
+  --pc-accent-strong: #b8420c;
+  --pc-accent-soft: rgb(242 103 46 / 13%);
+  --pc-accent-ring: rgb(242 103 46 / 45%);
+
+  --pc-danger: #d1341f;
+  --pc-danger-soft: rgb(209 52 31 / 12%);
+
+  --pc-ring: #3b5bdb;
+  --pc-ring-soft: rgb(59 91 219 / 40%);
+
+  --pc-key-shadow:
+    0 1px 0 rgb(255 255 255 / 90%) inset, 0 2px 5px rgb(60 50 35 / 10%);
+  --pc-key-shadow-active:
+    0 1px 0 rgb(255 255 255 / 70%) inset, 0 1px 2px rgb(60 50 35 / 12%);
+  --pc-card-shadow:
+    0 30px 70px -34px rgb(58 48 32 / 38%),
+    0 1px 0 rgb(255 255 255 / 90%) inset;
+  --pc-panel-shadow: 0 24px 56px -26px rgb(58 48 32 / 34%);
+  --pc-hairline: rgb(20 22 26 / 8%);
+}
