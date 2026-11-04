@@ -19,8 +19,13 @@ Both files live in the **`release/`** folder of this project.
 > Play Store listings do **not** accept `.apk` files for new apps.
 
 Both files are already signed with your release key, so you can upload or
-install them right now. They are committed to the repository for convenience;
-rebuild them at any time with `npm run android:aab` and `npm run android:apk`.
+install them right now. They are **build outputs**, so they are not stored in
+git — rebuild them at any time with:
+
+```bash
+npm run android:aab     # -> release/calculator-release.aab
+npm run android:apk     # -> release/calculator-test.apk
+```
 
 ---
 

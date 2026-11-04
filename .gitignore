@@ -21,6 +21,12 @@ __pycache__/
 # Verification artefacts (screenshots)
 .artifacts/
 
+# Signed release artefacts. They are build outputs, not source: GitHub's
+# push pipeline rejects them, and they are large binaries that would bloat
+# the history. Rebuild them with `npm run android:aab` / `npm run android:apk`.
+release/*.aab
+release/*.apk
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
