@@ -431,6 +431,21 @@ manifest (name, icons, maskable icon, every icon resolving), service worker
 registration, and that the app still renders *and calculates* with the network
 switched off.
 
+### Dependency audit
+
+`npm audit` reports **4 low-severity advisories**, all in the *build-time*
+dependency chain `vite-plugin-pwa → workbox-build → @rollup/plugin-node-resolve`
+and rooted in `deepmerge@4.3.1` (GHSA-gcqx-w48m-w2h4, prototype poisoning in
+`mergeObject()`). **No patched `deepmerge` release exists yet** — the advisory
+range still includes the latest version — and the only "fix" npm can offer is
+downgrading `vite-plugin-pwa` to `0.2.1`, which is incompatible with Vite 8.
+
+None of this code ships: it runs only during `npm run build` and none of it
+reaches the browser bundle. The eight moderate-severity advisories that the
+chain originally carried (`minimatch`, `glob`, `ejs`) were resolved with the
+`overrides` block in `package.json`, and the build, the service worker and the
+offline behaviour were re-verified afterwards.
+
 ### Not verified
 
 The haptics and the safe-area insets were verified by code inspection and

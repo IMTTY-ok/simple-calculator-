@@ -1,8 +1,27 @@
 {
-  "name": "calculator-4-11-26",
+  "name": "calculator",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A premium, tactile calculator PWA with a verified calculation engine, haptics, history and offline support.",
+  "license": "MIT",
+  "author": "Imtty",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IMTTY-ok/simple-calculator-.git"
+  },
+  "keywords": [
+    "calculator",
+    "pwa",
+    "offline-first",
+    "react",
+    "typescript",
+    "haptics",
+    "accessible"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -28,11 +47,16 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.1",
     "oxlint": "^1.89.0",
     "tailwindcss": "^4.3.4",
     "typescript": "~7.0.2",
     "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0"
+  },
+  "overrides": {
+    "minimatch": "^11.0.4",
+    "glob": "^14.0.3",
+    "ejs": "^5.0.2"
   }
 }
