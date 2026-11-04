@@ -2,6 +2,10 @@
 # operating system.
 * text=auto eol=lf
 
+# Windows command scripts need CRLF to run correctly.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 *.png binary
 *.jpg binary
 *.webp binary

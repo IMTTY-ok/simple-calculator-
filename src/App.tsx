@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { Calculator } from './components/Calculator/Calculator'
 import { HistoryPanel } from './components/History/HistoryPanel'
+import { PrivacyPolicySheet } from './components/Privacy/PrivacyPolicySheet'
 import { SettingsPanel } from './components/Settings/SettingsPanel'
 import { Sheet } from './components/ui/Sheet'
 import { TopBar } from './components/TopBar'
@@ -10,16 +11,17 @@ import type { KeyDefinition } from './engine/keyDefinitions'
 import { useCalculator } from './hooks/useCalculator'
 import { useHistory } from './hooks/useHistory'
 import { useKeyboard } from './hooks/useKeyboard'
+import { useNativeBackButton, useNativeStatusBar } from './hooks/useNativePlatform'
 import { useSettings } from './hooks/settingsContext'
 import type { HistoryEntry } from './types/calculator'
 
-type Panel = 'history' | 'settings' | null
+type Panel = 'history' | 'settings' | 'privacy' | null
 
 /**
  * The application shell.
  */
 export function App() {
-  const { settings } = useSettings()
+  const { settings, resolvedTheme } = useSettings()
   const history = useHistory()
 
   const { state, display, dispatch } = useCalculator({
@@ -40,6 +42,13 @@ export function App() {
   // Physical keyboard support. Suspended while a panel is open so that
   // Escape closes the panel instead of clearing the calculator.
   useKeyboard(dispatch, panel === null)
+
+  const closePanel = useCallback(() => setPanel(null), [])
+
+  // Native integration: the system bars follow the theme, and the Android
+  // back button closes an open panel before it leaves the app.
+  useNativeStatusBar(resolvedTheme)
+  useNativeBackButton(panel !== null, closePanel)
 
   const handlePress = useCallback(
     (definition: KeyDefinition) => {
@@ -115,12 +124,18 @@ export function App() {
 
       <Sheet
         open={panel === 'settings'}
-        onClose={() => setPanel(null)}
+        onClose={closePanel}
         title="Settings"
         description="Feedback, appearance and stored data."
       >
-        <SettingsPanel historyCount={history.entries.length} onClearHistory={history.clear} />
+        <SettingsPanel
+          historyCount={history.entries.length}
+          onClearHistory={history.clear}
+          onOpenPrivacy={() => togglePanel('privacy')}
+        />
       </Sheet>
+
+      <PrivacyPolicySheet open={panel === 'privacy'} onClose={closePanel} />
     </div>
   )
 }

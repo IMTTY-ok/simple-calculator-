@@ -1,0 +1,8 @@
+Calculator 1.0.0 — first release.
+
+• A fast, minimal calculator with a dark and a light theme.
+• Correct arithmetic: operator precedence, decimals, negatives, percentages
+  and repeated equals, verified against an independent reference engine.
+• Real Android haptic feedback, with an optional sound cue.
+• Calculation history stored on your device, reusable with one tap.
+• Works completely offline — no account, no ads, no tracking, no permissions.

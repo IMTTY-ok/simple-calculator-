@@ -1,4 +1,4 @@
-import { Monitor, Moon, Sun } from 'lucide-react'
+import { ChevronRight, Monitor, Moon, Sun } from 'lucide-react'
 
 import { useSettings, type ThemePreference } from '../../hooks/settingsContext'
 import { cn } from '../../utils/cn'
@@ -7,6 +7,7 @@ import { Toggle } from './Toggle'
 interface SettingsPanelProps {
   historyCount: number
   onClearHistory: () => void
+  onOpenPrivacy: () => void
 }
 
 const THEME_OPTIONS: Array<{
@@ -22,7 +23,11 @@ const THEME_OPTIONS: Array<{
 /**
  * Preferences: theme, feedback and data.
  */
-export function SettingsPanel({ historyCount, onClearHistory }: SettingsPanelProps) {
+export function SettingsPanel({
+  historyCount,
+  onClearHistory,
+  onOpenPrivacy,
+}: SettingsPanelProps) {
   const { settings, setSetting, hapticsSupported, prefersReducedMotion } = useSettings()
 
   return (
@@ -77,8 +82,7 @@ export function SettingsPanel({ historyCount, onClearHistory }: SettingsPanelPro
             }
             checked={settings.haptics}
             onChange={(value) => setSetting('haptics', value)}
-          />
-          <Toggle
+          />          <Toggle
             label="Sound feedback"
             description="A soft click on every key. Off by default."
             checked={settings.sound}
@@ -107,9 +111,25 @@ export function SettingsPanel({ historyCount, onClearHistory }: SettingsPanelPro
 
       <section>
         <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-dim">
-          Data
+          About
         </h3>
         <div className="divide-y divide-hairline">
+          <button
+            type="button"
+            onClick={onOpenPrivacy}
+            className="flex w-full items-center justify-between gap-4 py-3 text-left"
+          >
+            <span className="min-w-0">
+              <span className="block text-[13.5px] font-medium leading-5 text-ink">
+                Privacy policy
+              </span>
+              <span className="mt-0.5 block text-[12px] leading-[1.45] text-ink-dim">
+                What the app stores, and what it never sends anywhere.
+              </span>
+            </span>
+            <ChevronRight size={16} className="shrink-0 text-ink-dim" aria-hidden="true" />
+          </button>
+
           <div className="flex items-center justify-between gap-4 py-2.5">
             <div>
               <p className="text-[13.5px] font-medium leading-5 text-ink">Clear history</p>

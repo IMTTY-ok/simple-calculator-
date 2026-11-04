@@ -1,0 +1,11 @@
+Application category:  Tools
+
+Category reasoning
+------------------
+Calculator belongs in "Tools" (not "Productivity" or "Finance"). Google Play's
+"Tools" category is described as "apps that perform tasks", which is exactly
+what this is. It is not a productivity suite and it does not manage money, so
+"Finance" would be misleading to users.
+
+Category can be changed later, but it is easier to get it right before the
+first review.

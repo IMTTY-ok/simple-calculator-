@@ -1,0 +1,31 @@
+Calculator is a premium, minimal calculator built to feel like a real piece of hardware — and to stay out of your way while you work.
+
+PRETTY NUMBERS, EVERY TIME
+• A large, high-contrast display with tabular figures that never shift or reflow as you type.
+• Live result preview: see where a calculation is heading before you press equals.
+• Full expressions stay visible, so you always know what you are looking at.
+
+REAL HAPTIC FEEDBACK
+Every interaction has its own feel on Android: a light tap for numbers, a firmer one for operators, a confirmation pulse for equals and a distinct buzz for errors. A subtle synthesised click is available too, and both can be switched off.
+
+BUILT FOR REAL CALCULATIONS
+• Correct operator precedence — 2 + 3 × 4 is 14, not 20.
+• Percentages that behave the way you expect: 200 + 10% is 220, and 200 × 10% is 20.
+• Decimals, negative numbers, backspace, clear entry and clear all.
+• Repeated equals repeats the last operation, so 2 + 3 = = gives you 8.
+• Division by zero is reported clearly instead of showing nonsense.
+• Very large and very small numbers are formatted properly, never as floating-point noise — 0.1 + 0.2 is 0.3.
+
+CALM AND CAPABLE
+• A refined dark theme and an equally considered light theme.
+• The last 50 calculations are stored on your device so you can reuse a result, or delete them at any time.
+• Full keyboard support on a laptop or tablet.
+• Accessible by design: large touch targets, clear focus states, screen-reader friendly announcements and reduced-motion support.
+
+PRIVATE BY DEFAULT
+Calculator asks for no permissions and collects nothing. There is no account, no server, no analytics and no advertising. Your history and settings live on your device and stay there — Android cloud backup is switched off on purpose. The app works completely offline, in airplane mode, with no connection at all.
+
+FAST, LIGHT, HONEST
+The entire app is under 2 MB, opens instantly, and is verified by an automated test suite: a Python reference engine calculates the same results using exact decimal arithmetic, and every release is checked against it.
+
+No sign-up. No subscription. No nonsense. Just a calculator that does the arithmetic properly.

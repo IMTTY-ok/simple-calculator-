@@ -446,6 +446,52 @@ def check_toggles(page: Page) -> None:
         ok(f"the knob animates across the track ({samples[0]} -> {samples[-1]})")
 
 
+def check_privacy_policy(page: Page) -> None:
+    """The bundled privacy policy must load and follow the app theme."""
+    print("\n[privacy policy]")
+    page.goto(URL, wait_until="networkidle")
+    page.wait_for_timeout(300)
+
+    # The standalone page (this is the file published for Google Play).
+    page.goto(f"{URL}privacy-policy.html", wait_until="networkidle")
+    page.wait_for_timeout(300)
+    heading = page.locator("h1").inner_text().strip()
+    if heading != "Privacy Policy":
+        fail(f"privacy policy page heading was {heading!r}")
+    else:
+        ok("the privacy policy page renders")
+
+    # The in-app sheet.
+    page.goto(URL, wait_until="networkidle")
+    page.wait_for_timeout(600)
+    page.get_by_role("button", name="Settings").click()
+    page.wait_for_timeout(400)
+    page.get_by_role("button", name="Privacy policy").click()
+    page.wait_for_timeout(1200)
+
+    frame = page.frame_locator("iframe[title='Privacy policy']")
+    try:
+        inner = frame.locator("h1").inner_text(timeout=8000).strip()
+    except Exception:
+        inner = ""
+
+    if inner != "Privacy Policy":
+        fail(f"the in-app privacy policy did not load (got {inner!r})")
+    else:
+        ok("the privacy policy opens inside the app")
+
+    theme = page.evaluate(
+        """() => {
+            const doc = document.querySelector('iframe')?.contentDocument;
+            return doc ? doc.documentElement.dataset.theme ?? 'none' : 'no document';
+        }"""
+    )
+    if theme != "dark":
+        fail(f"the privacy policy did not follow the app theme (theme={theme!r})")
+    else:
+        ok("the privacy policy follows the app theme")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:5173")
@@ -479,6 +525,7 @@ def main() -> int:
         check_theme_and_panels(page, out)
         check_escape_closes_panels(page)
         check_toggles(page)
+        check_privacy_policy(page)
         check_accessibility(page)
 
         browser.close()

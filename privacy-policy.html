@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="index, follow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Privacy Policy — Calculator</title>
+    <meta
+      name="description"
+      content="Calculator runs entirely on your device. No account, no servers, no tracking, no data collection."
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #0a0b0d;
+        --surface: #16191d;
+        --border: #2b3038;
+        --text: #eef1f5;
+        --muted: #8b929c;
+        --accent: #ff7a3d;
+        --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+          Arial, sans-serif;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme='dark']) {
+          --bg: #edeae4;
+          --surface: #fbf9f5;
+          --border: #ddd8cf;
+          --text: #14161a;
+          --muted: #5a6069;
+          --accent: #c9450d;
+        }
+      }
+
+      :root[data-theme='light'] {
+        --bg: #edeae4;
+        --surface: #fbf9f5;
+        --border: #ddd8cf;
+        --text: #14161a;
+        --muted: #5a6069;
+        --accent: #c9450d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0 20px 72px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      header {
+        padding: 56px 0 28px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 36px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .eyebrow svg {
+        color: var(--accent);
+        display: block;
+      }
+
+      h1 {
+        font-size: clamp(1.9rem, 6vw, 2.6rem);
+        line-height: 1.12;
+        letter-spacing: -0.03em;
+        margin: 0 0 12px;
+        font-weight: 600;
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 1.02rem;
+        margin: 0;
+        max-width: 54ch;
+      }
+
+      h2 {
+        font-size: 1.12rem;
+        letter-spacing: -0.01em;
+        margin: 40px 0 10px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0 0 14px;
+        color: var(--text);
+      }
+
+      ul {
+        margin: 0 0 14px;
+        padding-left: 20px;
+        color: var(--text);
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      strong {
+        font-weight: 600;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px 22px;
+        margin: 0 0 28px;
+      }
+
+      .badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1px solid color-mix(in oklab, var(--accent) 40%, transparent);
+        border-radius: 999px;
+        padding: 3px 10px;
+        margin-bottom: 12px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 0 14px;
+        font-size: 0.94rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+
+      th {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      td:first-child {
+        white-space: nowrap;
+      }
+
+      footer {
+        margin-top: 48px;
+        padding-top: 22px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 13.5px;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 0.9em;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1px 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // When the page is shown inside the app, follow the app's theme rather
+      // than the operating system preference.
+      (function () {
+        var theme = new URLSearchParams(window.location.search).get('theme');
+        if (theme === 'dark' || theme === 'light') {
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        }
+      })();
+    </script>
+    <main>
+      <header>
+        <span class="eyebrow">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="8" height="8" rx="2.2" stroke="currentColor" stroke-width="1.9" opacity="0.5" />
+            <rect x="14" y="2" width="8" height="8" rx="2.2" stroke="currentColor" stroke-width="1.9" opacity="0.5" />
+            <rect x="2" y="14" width="8" height="8" rx="2.2" stroke="currentColor" stroke-width="1.9" opacity="0.5" />
+            <rect x="14" y="14" width="8" height="8" rx="2.2" fill="currentColor" />
+          </svg>
+          Calculator
+        </span>
+        <h1>Privacy Policy</h1>
+        <p class="lede">
+          Calculator is a calculator, not a service. It has no account system, no
+          backend and no analytics. Everything you type stays on your device.
+        </p>
+      </header>
+
+      <div class="card">
+        <span class="badge">Short version</span>
+        <p style="margin: 0">
+          <strong>No data is collected, no data is shared, and nothing is sent
+          anywhere.</strong> The app performs every calculation on your device
+          and stores your preferences and history only in your device's own
+          local storage. It works with no internet connection at all.
+        </p>
+      </div>
+
+      <h2>What the app does with your calculations</h2>
+      <p>
+        Every arithmetic operation is performed locally, inside the app, using a
+        token-based expression engine that runs entirely in the app's own
+        JavaScript runtime. Your numbers are never transmitted, logged or
+        uploaded.
+      </p>
+
+      <h2>What is stored on your device</h2>
+      <p>
+        Two small pieces of information are kept, both in the platform's local
+        storage (<code>localStorage</code>) on your device only:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>What</th>
+            <th>Why</th>
+            <th>Where it lives</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Settings</td>
+            <td>Theme, haptic and sound preferences, reduced-motion preference</td>
+            <td>Local storage on your device</td>
+          </tr>
+          <tr>
+            <td>History</td>
+            <td>The last 50 calculations, so you can reuse a result</td>
+            <td>Local storage on your device</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">
+        This data never leaves the device. It is not uploaded, not synchronised,
+        and not backed up to a cloud service. On Android, the application
+        disables Android's backup and device-transfer mechanisms, so even the
+        operating system does not copy it to a cloud backup or to another
+        device.
+      </p>
+
+      <h2>No account, no server, no third-party services</h2>
+      <p>Calculator does not use, and does not require:</p>
+      <ul>
+        <li>User accounts, sign-in or any authentication service</li>
+        <li>Remote servers, APIs or backend databases</li>
+        <li>Cloud storage or file-syncing services</li>
+        <li>Analytics, telemetry, crash reporting or advertising SDKs</li>
+        <li>Advertising, tracking or profiling of any kind</li>
+      </ul>
+
+      <h2>Permissions</h2>
+      <p>
+        The application requests <strong>no runtime permissions</strong>. It
+        does not access the camera, microphone, location, contacts, files or
+        any other sensor.
+      </p>
+      <p>
+        The Android package declares the standard internet permission. It is
+        required by the Android WebView runtime that renders the interface; the
+        app does not use it to make any network request. All of the
+        application's code, fonts and images are bundled inside the installed
+        application.
+      </p>
+
+      <h2>Offline by design</h2>
+      <p>
+        The application is fully functional with no internet connection,
+        including in airplane mode. After the first launch it does not need a
+        network connection at all: the interface, the fonts and the calculator
+        engine are all stored on the device.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        Because the app collects no data whatsoever, it is safe for all ages.
+        It contains no ads, no purchases and no links to external content.
+      </p>
+
+      <h2>Changes to this policy</h2>
+      <p>
+        If the app ever changes in a way that affects data handling, this
+        policy will be updated in the same release as the change, and the
+        "Last updated" date below will change.
+      </p>
+
+      <footer>
+        <p style="margin: 0">
+          Last updated: <strong>4 November 2026</strong><br />
+          If you have a question about this policy, open an issue on the
+          project's public repository.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

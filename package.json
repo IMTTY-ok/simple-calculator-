@@ -25,6 +25,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:android": "tsc -b && vite build --mode android",
     "lint": "oxlint",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty",
@@ -32,9 +33,19 @@
     "test:ui": "python scripts/ui_check.py",
     "test:pwa": "python scripts/pwa_check.py",
     "verify:fixtures": "node scripts/verify-fixtures.mjs",
-    "icons": "python scripts/generate_icons.py"
+    "assets": "python scripts/generate_assets.py",
+    "signing:key": "python scripts/create_signing_key.py",
+    "cap:sync": "npm run build:android && cap sync android",
+    "android:apk": "npm run cap:sync && cap build android --androidreleasetype APK",
+    "android:aab": "npm run cap:sync && cap build android --androidreleasetype AAB",
+    "android:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "lucide-react": "^1.68.0",
@@ -43,6 +54,8 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",

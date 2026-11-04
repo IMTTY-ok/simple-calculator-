@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { IconButton } from './IconButton'
+import { cn } from '../../utils/cn'
 
 interface SheetProps {
   open: boolean
@@ -13,6 +14,8 @@ interface SheetProps {
   children: ReactNode
   /** Rendered in a sticky footer, e.g. a "clear all" action. */
   footer?: ReactNode
+  /** Extra classes for the scrollable content region. */
+  contentClassName?: string
 }
 
 /**
@@ -22,7 +25,15 @@ interface SheetProps {
  * right-hand drawer. One component, two presentations, so the panels behave
  * identically everywhere.
  */
-export function Sheet({ open, onClose, title, description, children, footer }: SheetProps) {
+export function Sheet({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  footer,
+  contentClassName,
+}: SheetProps) {
   const reduceMotion = useReducedMotion()
   const isWide = useMediaQuery('(min-width: 768px)')
   const panelRef = useRef<HTMLDivElement>(null)
@@ -133,7 +144,12 @@ export function Sheet({ open, onClose, title, description, children, footer }: S
               </IconButton>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
+            <div
+              className={cn(
+                'min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4',
+                contentClassName,
+              )}
+            >
               {children}
             </div>
 
