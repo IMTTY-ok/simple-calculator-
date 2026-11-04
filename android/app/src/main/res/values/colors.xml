@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's own surfaces, so the native chrome matches the web app. -->
+    <color name="pcBackground">#0a0b0d</color>
+    <color name="pcBackgroundLight">#edeae4</color>
+    <color name="pcAccent">#ff7a3d</color>
+    <color name="pcText">#eef1f5</color>
+</resources>

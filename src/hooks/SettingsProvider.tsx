@@ -7,19 +7,47 @@ import {
   type ResolvedTheme,
   type Settings,
   type SettingsContextValue,
+  type ThemePreference,
 } from './settingsContext'
 import { readStorage, writeStorage } from '../utils/storage'
 
 const STORAGE_KEY = 'settings'
 
 /**
+ * Validate what was read back from storage.
+ *
+ * A hand-edited or corrupted value must never be able to put the app into an
+ * impossible state — an unknown theme, for instance, would leave the document
+ * with neither the light nor the dark class.
+ */
+function sanitise(value: unknown): Settings {
+  if (typeof value !== 'object' || value === null) return { ...DEFAULT_SETTINGS }
+  const candidate = value as Partial<Settings>
+
+  const theme: ThemePreference =
+    candidate.theme === 'light' || candidate.theme === 'dark' || candidate.theme === 'system'
+      ? candidate.theme
+      : DEFAULT_SETTINGS.theme
+
+  return {
+    theme,
+    haptics:
+      typeof candidate.haptics === 'boolean' ? candidate.haptics : DEFAULT_SETTINGS.haptics,
+    sound: typeof candidate.sound === 'boolean' ? candidate.sound : DEFAULT_SETTINGS.sound,
+    reducedMotion:
+      typeof candidate.reducedMotion === 'boolean'
+        ? candidate.reducedMotion
+        : DEFAULT_SETTINGS.reducedMotion,
+  }
+}
+
+/**
  * Provides user preferences and keeps the document in sync with them.
  */
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(() => ({
-    ...DEFAULT_SETTINGS,
-    ...readStorage<Partial<Settings>>(STORAGE_KEY, {}),
-  }))
+  const [settings, setSettings] = useState<Settings>(() =>
+    sanitise(readStorage<unknown>(STORAGE_KEY, {})),
+  )
 
   const systemPrefersDark = useMediaQuery('(prefers-color-scheme: dark)')
   const systemPrefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')

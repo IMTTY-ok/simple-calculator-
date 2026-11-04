@@ -9,7 +9,9 @@ mistake is caught on your own phone, not by Google after a two-week review.
 
 - [x] **Type check passes** — `npm run typecheck` (no errors)
 - [x] **Lint passes** — `npm run lint` (no warnings)
-- [x] **Python test suite passes** — `npm run test:python` → **163 passed**
+- [x] **Python test suite passes** — `npm run test:python` → **183 passed**
+- [x] **Engines agree on random input** — `npm run test:fuzz` → 0 mismatches over 80 000 random key sequences
+- [x] **Engines agree after an error** — `npm run test:parity` → 0 mismatches over every action taken from every error state
 - [x] **Frontend production build succeeds** — `npm run build`
 - [x] **Android bundle built** — `android/app/build/outputs/bundle/release/app-release.aab`
 - [x] **Android APK built** — `android/app/build/outputs/apk/release/app-release.apk`

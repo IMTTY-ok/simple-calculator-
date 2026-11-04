@@ -190,6 +190,23 @@ export function calculatorReducer(
     case 'operator': {
       if (state.error) return { ...createInitialState(), resetCount: state.resetCount }
 
+      // A leading minus starts a negative number, the way a physical
+      // calculator does — otherwise "− 5" would silently read as "5".
+      if (
+        state.tokens.length === 0 &&
+        state.entry === null &&
+        !state.justEvaluated &&
+        action.op === '-'
+      ) {
+        return {
+          ...state,
+          entry: '-',
+          lastOperator: null,
+          lastOperand: null,
+          lastOperandPercent: false,
+        }
+      }
+
       let tokens = state.tokens
       let entry = state.entry
       let justEvaluated = state.justEvaluated
@@ -420,13 +437,16 @@ export function calculatorReducer(
       if (state.error) return { ...state, error: null }
 
       if (state.entry !== null) {
-        const entry = state.entry.startsWith('-')
-          ? state.entry.slice(1)
-          : `-${state.entry}`
+        // Toggling the sign off a lone "-" leaves nothing behind.
+        const entry = state.entry === '-'
+          ? null
+          : state.entry.startsWith('-')
+            ? state.entry.slice(1)
+            : `-${state.entry}`
         return {
           ...state,
           entry,
-          lastOperand: parseEntry(entry),
+          lastOperand: entry === null ? null : parseEntry(entry),
           lastOperandPercent: false,
         }
       }
@@ -512,7 +532,7 @@ export function deriveDisplay(state: CalculatorState): DisplayState {
   }
 
   const full = state.entry !== null ? [...state.tokens, numberToken(state.entry)] : state.tokens
-  const expression = formatTokens(full)
+  const expression = formatTokens(full, state.entry)
   const evaluable = stripTrailingOperator(full)
 
   const outcome = evaluateSafe(evaluable)

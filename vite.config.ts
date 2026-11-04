@@ -71,8 +71,9 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,svg,png,woff2,ico}'],
           navigateFallback: 'index.html',
           // The privacy policy is a real page of its own — it must be served
-          // as-is rather than replaced by the app shell.
-          navigateFallbackDenylist: [/^\/privacy-policy\.html/],
+          // as-is rather than replaced by the app shell. The pattern is
+          // matched against the full URL, so it is not anchored.
+          navigateFallbackDenylist: [/\/privacy-policy\.html/],
           cleanupOutdatedCaches: true,
         },
       }),

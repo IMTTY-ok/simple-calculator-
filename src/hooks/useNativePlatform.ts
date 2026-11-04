@@ -23,9 +23,9 @@ export function useNativeStatusBar(theme: ResolvedTheme): void {
 
     void (async () => {
       try {
-        // The web layer is inset below the status bar rather than drawing
-        // underneath it, so the layout never has to compensate for it.
-        await StatusBar.setOverlaysWebView({ overlay: false })
+        // The status bar is transparent on Android 15+, so the app's own
+        // surface shows through it — only the icon contrast needs setting.
+        // The safe-area insets are handled by Capacitor's SystemBars config.
         await StatusBar.setStyle({
           style: theme === 'dark' ? Style.Dark : Style.Light,
         })

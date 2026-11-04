@@ -24,7 +24,7 @@ export function PrivacyPolicySheet({ open, onClose }: PrivacyPolicySheetProps) {
       onClose={onClose}
       title="Privacy"
       description="Everything runs on your device."
-      contentClassName="overflow-hidden"
+      contentOverflow="hidden"
     >
       <iframe
         src={`/privacy-policy.html?theme=${resolvedTheme}`}

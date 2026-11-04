@@ -288,6 +288,36 @@
         "preview": null,
         "error": null
       }
+    },
+    {
+      "id": "leading-minus-negative",
+      "description": "A leading minus starts a negative number, like a physical calculator",
+      "keys": ["-", "5", "="],
+      "expected": { "expression": "−5 =", "value": "−5", "preview": null, "error": null }
+    },
+    {
+      "id": "leading-minus-arithmetic",
+      "description": "A negative operand takes part in the arithmetic",
+      "keys": ["-", "5", "×", "2", "="],
+      "expected": { "expression": "−5 × 2 =", "value": "−10", "preview": null, "error": null }
+    },
+    {
+      "id": "entry-trailing-decimal",
+      "description": "The expression keeps the trailing decimal point while typing",
+      "keys": ["0", "."],
+      "expected": { "expression": "0.", "value": "0.", "preview": null, "error": null }
+    },
+    {
+      "id": "backspace-dismisses-error",
+      "description": "Backspace after an error clears it and returns to an empty display",
+      "keys": ["5", "÷", "0", "=", "⌫"],
+      "expected": { "expression": "", "value": "0", "preview": null, "error": null }
+    },
+    {
+      "id": "sign-toggled-off",
+      "description": "Pressing the sign key twice cancels the sign",
+      "keys": ["±", "±"],
+      "expected": { "expression": "", "value": "0", "preview": null, "error": null }
     }
   ]
 }

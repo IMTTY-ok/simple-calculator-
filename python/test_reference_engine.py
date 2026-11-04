@@ -214,11 +214,24 @@ def test_format_tokens_binds_percent_to_its_number():
 
 
 def test_clean_number_rounds_to_twelve_significant_digits():
-    assert clean_number(Decimal(1) / Decimal(3)) == Decimal("0.333333333333")
+    # The cleanup returns the nearest double of the 12-digit rounding, which
+    # is exactly what the browser's `Number(value.toPrecision(12))` produces.
+    cleaned = clean_number(Decimal(1) / Decimal(3))
+    assert format_number(cleaned) == "0.333333333333"
+    assert cleaned == Decimal(float(cleaned))
+
+
+def test_parse_entry_matches_the_browser_double():
+    # 0.1 and 0.2 are not exactly representable; the engine must start from
+    # the same doubles the browser does, so the sum displays as 0.3.
+    assert parse_entry("0.1") == Decimal(float(Decimal("0.1")))
+    assert format_number(parse_entry("0.1") + parse_entry("0.2")) == "0.3"
 
 
 def test_parse_entry_is_exact_for_repeating_decimals():
-    assert parse_entry("0.1") + parse_entry("0.2") == Decimal("0.3")
+    # The entry keeps every digit the user typed, and the arithmetic is
+    # carried out at full double precision.
+    assert format_number(parse_entry("0.123456789012")) == "0.123456789012"
 
 
 # ---------------------------------------------------------------------------
@@ -284,6 +297,30 @@ def test_key_sequence_very_small_numbers():
 def test_key_sequence_percentage_semantics():
     assert run_key_sequence(["2", "0", "0", "+", "1", "0", PERCENT, "="])["value"] == "220"
     assert run_key_sequence(["2", "0", "0", TIMES, "1", "0", PERCENT, "="])["value"] == "20"
+
+
+def test_key_sequence_leading_minus_starts_a_negative_number():
+    assert run_key_sequence(["-", "5", "="])["value"] == MINUS + "5"
+    assert run_key_sequence(["-", "5", TIMES, "2", "="])["value"] == MINUS + "10"
+
+
+def test_key_sequence_entry_keeps_the_trailing_decimal_point():
+    result = run_key_sequence(["0", "."])
+    assert result["expression"] == "0."
+    assert result["value"] == "0."
+
+
+def test_key_sequence_backspace_dismisses_an_error():
+    result = run_key_sequence(["5", DIVIDE, "0", "=", BACKSPACE])
+    assert result["error"] is None
+    assert result["value"] == "0"
+    assert result["expression"] == ""
+
+
+def test_key_sequence_sign_key_toggles_off():
+    result = run_key_sequence([SIGN, SIGN])
+    assert result["value"] == "0"
+    assert result["expression"] == ""
 
 
 def test_set_entry_replaces_the_current_entry():

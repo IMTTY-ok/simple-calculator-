@@ -19,13 +19,21 @@ const config: CapacitorConfig = {
     allowMixedContent: false,
     // Matches the dark app surface so the launch window does not flash white.
     backgroundColor: '#0a0b0d',
-    // Let the system draw the app behind the status bar and let the web layer
-    // add the padding for it.
-    adjustMarginsForEdgeToEdge: 'auto',
     webContentsDebuggingEnabled: false,
   },
 
   plugins: {
+    // Capacitor 8 owns the system bars. Letting it handle the safe-area
+    // insets natively is what keeps the layout correct on Android 15+, where
+    // edge-to-edge is enforced: the web view fills the screen and reports the
+    // real insets, which the app's CSS then pads out.
+    SystemBars: {
+      insetsHandling: 'css',
+      initialViewportFitValueHint: 'cover',
+      style: 'DEFAULT',
+      animation: 'FADE',
+    },
+
     SplashScreen: {
       // Hand over to the web app as soon as it has rendered.
       launchAutoHide: true,

@@ -19,13 +19,36 @@ export interface UseHistoryResult {
 }
 
 /**
+ * Validate what was read back from storage.
+ *
+ * Local storage can be edited by hand, corrupted by another version of the
+ * app, or written by a browser extension. Anything that does not look like a
+ * history entry is discarded rather than allowed to crash the app.
+ */
+function sanitise(value: unknown): HistoryEntry[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((entry): entry is HistoryEntry => {
+    if (typeof entry !== 'object' || entry === null) return false
+    const candidate = entry as Partial<HistoryEntry>
+    return (
+      typeof candidate.id === 'string' &&
+      typeof candidate.expression === 'string' &&
+      typeof candidate.result === 'string' &&
+      typeof candidate.value === 'number' &&
+      Number.isFinite(candidate.value) &&
+      typeof candidate.timestamp === 'number'
+    )
+  })
+}
+
+/**
  * Calculation history, persisted locally.
  *
  * History is stored in `localStorage` only — nothing leaves the device.
  */
 export function useHistory(): UseHistoryResult {
   const [entries, setEntries] = useState<HistoryEntry[]>(() =>
-    readStorage<HistoryEntry[]>(STORAGE_KEY, []),
+    sanitise(readStorage<unknown>(STORAGE_KEY, [])),
   )
 
   useEffect(() => {

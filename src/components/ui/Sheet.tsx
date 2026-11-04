@@ -14,8 +14,13 @@ interface SheetProps {
   children: ReactNode
   /** Rendered in a sticky footer, e.g. a "clear all" action. */
   footer?: ReactNode
-  /** Extra classes for the scrollable content region. */
-  contentClassName?: string
+  /**
+   * Whether the content region scrolls itself.
+   *
+   * Set to `hidden` when the content manages its own scrolling — an iframe,
+   * for example — so the two scroll areas never fight each other.
+   */
+  contentOverflow?: 'auto' | 'hidden'
 }
 
 /**
@@ -32,7 +37,7 @@ export function Sheet({
   description,
   children,
   footer,
-  contentClassName,
+  contentOverflow = 'auto',
 }: SheetProps) {
   const reduceMotion = useReducedMotion()
   const isWide = useMediaQuery('(min-width: 768px)')
@@ -68,6 +73,41 @@ export function Sheet({
         onCloseRef.current()
       }
     }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [open])
+
+  // Keep keyboard focus inside the dialog while it is open, so Tab can never
+  // wander into the calculator behind the sheet.
+  useEffect(() => {
+    if (!open) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const panel = panelRef.current
+      if (!panel) return
+
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.offsetParent !== null || element === document.activeElement)
+
+      if (focusable.length === 0) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+
+      if (event.shiftKey && (active === first || !panel.contains(active))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (active === last || !panel.contains(active))) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open])
@@ -146,8 +186,8 @@ export function Sheet({
 
             <div
               className={cn(
-                'min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4',
-                contentClassName,
+                'min-h-0 flex-1 overscroll-contain px-5 pb-4',
+                contentOverflow === 'hidden' ? 'overflow-hidden' : 'overflow-y-auto',
               )}
             >
               {children}

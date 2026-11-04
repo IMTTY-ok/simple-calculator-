@@ -116,17 +116,28 @@ export function formatEntry(raw: string): string {
  * Render a token stream as a readable expression, e.g. `200 + 10%`.
  *
  * A `%` binds to the number in front of it, so it is never separated by a
- * space.
+ * space. When ``rawEntry`` is given it replaces the final number, so the
+ * text the user is still typing (for example `0.`) is shown verbatim rather
+ * than as its numeric value.
  */
-export function formatTokens(tokens: Token[]): string {
+export function formatTokens(tokens: Token[], rawEntry?: string | null): string {
   let result = ''
-  for (const token of tokens) {
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index]
+
     if (token.kind === 'percent') {
       result += '%'
       continue
     }
+
+    const isLast = index === tokens.length - 1
     const text =
-      token.kind === 'number' ? formatNumber(token.value) : OPERATOR_SYMBOL[token.op]
+      token.kind === 'number'
+        ? isLast && rawEntry
+          ? formatEntry(rawEntry)
+          : formatNumber(token.value)
+        : OPERATOR_SYMBOL[token.op]
+
     result += result === '' ? text : ` ${text}`
   }
   return result

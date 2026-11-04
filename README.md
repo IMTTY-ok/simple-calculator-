@@ -96,6 +96,7 @@ npm run dev            # → http://localhost:5173
 | `npm run typecheck` | `tsc -b` — full type check |
 | `npm run lint` | `oxlint` — lint the source |
 | `npm run test:python` | pytest — unit, fixture and differential tests |
+| `npm run test:fuzz` | Randomised differential test — thousands of random key sequences through both engines |
 | `npm run test:ui` | Playwright — 7 viewports, full interaction pass |
 | `npm run test:pwa` | Playwright — manifest, service worker, offline |
 | `npm run verify:fixtures` | Run the frontend engine against the shared fixture |
@@ -350,6 +351,35 @@ built-in type stripping (Node ≥ 22.18) — no extra tooling:
 npm run verify:fixtures    # prints the frontend engine's results as JSON
 ```
 
+### Randomised differential testing
+
+`npm run test:fuzz` goes further: it generates thousands of random key
+sequences, runs each one through **both** engines and compares the resulting
+displays. It is the check that caught two real bugs — a last-digit divergence
+after a catastrophic cancellation, and a disagreement about what backspace
+means after an error — that no hand-written fixture had found.
+
+```bash
+npm run test:fuzz                          # 4 000 sequences
+python scripts/fuzz_engines.py --cases 20000 --max-length 28 --seed 7
+```
+
+There is also a systematic check of every action taken from an error state,
+which is where the last two divergences were found:
+
+```bash
+npm run test:parity
+```
+
+Both engines use the same numeric model: IEEE-754 doubles, with the reference
+performing its arithmetic in exact `Decimal` and rounding each result to the
+double the browser would have produced. That keeps the two implementations
+bit-identical while still verifying the arithmetic rules independently.
+
+The randomised run above is what caught two real bugs — a last-digit
+divergence after a catastrophic cancellation, and a disagreement about what
+backspace means after an error — that no hand-written fixture had found.
+
 ---
 
 ## Haptics — what is real and what is not
@@ -508,6 +538,10 @@ the exact Data safety form answers and the dependency-by-dependency audit.
 │   ├── create_signing_key.py    creates the Android release key (outside the repo)
 │   ├── capture_screenshots.py   captures the real Play Store screenshots
 │   ├── verify-fixtures.mjs      runs the frontend engine against the fixture
+│   ├── fuzz_engines.py          randomised differential test (both engines)
+│   ├── error_path_parity.py     every action taken from an error state
+│   ├── prepare_android.py       pins the Gradle version, writes local.properties
+│   ├── strip_boms.py            removes byte-order marks from build files
 │   ├── ui_check.py              Playwright UI verification
 │   └── pwa_check.py             Playwright PWA + offline verification
 ├── python/
@@ -557,7 +591,7 @@ the exact Data safety form answers and the dependency-by-dependency audit.
 | --- | --- | --- |
 | Types | `npm run typecheck` | clean, no errors |
 | Lint | `npm run lint` | clean, no warnings |
-| Python suite | `npm run test:python` | **163 passed** |
+| Python suite | `npm run test:python` | **183 passed** |
 | Frontend engine vs. fixture | `npm run verify:fixtures` | matches the fixture exactly |
 | Build | `npm run build` | succeeds; the service worker precaches the built assets |
 | UI + interaction | `npm run test:ui` | all checks pass at 7 viewports |

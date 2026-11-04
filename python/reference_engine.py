@@ -196,38 +196,50 @@ class CalculationError(Exception):
 # ---------------------------------------------------------------------------
 
 
-def _quantize(value: Decimal) -> Decimal:
-    """Round to :data:`MAX_SIGNIFICANT_DIGITS` significant digits."""
+def _round12(value: Decimal) -> Decimal:
+    """Round to :data:`MAX_SIGNIFICANT_DIGITS` significant digits.
+
+    The result is a plain decimal — no floating-point expansion — so it can be
+    rendered directly.
+    """
     if value == 0:
         return Decimal(0)
     if value == value.to_integral_value():
         return value
-    exponent = value.adjusted()
-    quant = Decimal(1).scaleb(exponent - MAX_SIGNIFICANT_DIGITS + 1)
+    quant = Decimal(1).scaleb(value.adjusted() - MAX_SIGNIFICANT_DIGITS + 1)
     with localcontext() as ctx:
         ctx.prec = MAX_SIGNIFICANT_DIGITS + 2
+        # ROUND_HALF_UP matches JavaScript's `Number.prototype.toPrecision`,
+        # which rounds a tie away from zero.
+        ctx.rounding = ROUND_HALF_UP
         return value.quantize(quant)
 
 
-def clean_number(value: Decimal) -> Decimal:
-    """Remove floating-point-style noise from a computed value.
+def _to_double(value: Decimal) -> Decimal:
+    """Round an exact decimal result to the nearest IEEE-754 double.
 
-    The result is normalised so that ``220.0`` and ``0.300000000000`` render
-    as ``220`` and ``0.3`` — the same way the JavaScript engine renders them.
+    The browser engine computes with doubles, and so does this reference: the
+    Decimal arithmetic here is exact, and each result is then rounded to the
+    same double the browser would have produced. That keeps the two engines
+    bit-identical while still verifying the arithmetic rules independently.
+    """
+    return Decimal(float(value))
+
+
+def clean_number(value: Decimal) -> Decimal:
+    """Mirror the browser engine's number cleanup.
+
+    Rounds to :data:`MAX_SIGNIFICANT_DIGITS` significant digits and returns
+    the nearest double of that value — exactly what the browser's
+    ``Number(value.toPrecision(12))`` produces. Returning the *double* (not
+    the plain decimal) matters: every later operation must start from the
+    same number the browser starts from.
     """
     if not value.is_finite():
         return value
     if value == 0:
         return Decimal(0)
-    if value == value.to_integral_value():
-        # Integers are exact for every value a double can represent; do not
-        # round them and risk introducing an error.
-        return value.normalize()
-    exponent = value.adjusted()
-    quant = Decimal(1).scaleb(exponent - MAX_SIGNIFICANT_DIGITS + 1)
-    with localcontext() as ctx:
-        ctx.prec = MAX_SIGNIFICANT_DIGITS + 2
-        return value.quantize(quant).normalize()
+    return _to_double(_round12(value))
 
 
 def _group_digits(digits: str) -> str:
@@ -276,7 +288,7 @@ def format_number(value: Decimal) -> str:
     if magnitude >= EXPONENT_UPPER_BOUND or magnitude < EXPONENT_LOWER_BOUND:
         return _format_exponential(value)
 
-    cleaned = clean_number(value)
+    cleaned = _round12(value).normalize()
     negative = cleaned < 0
     text = format(abs(cleaned), "f")
     integer_part, _, fraction_part = text.partition(".")
@@ -305,14 +317,16 @@ def format_entry(raw: str) -> str:
     return f"{sign}{grouped}"
 
 
-def format_tokens(tokens: Sequence[Token]) -> str:
+def format_tokens(tokens: Sequence[Token], raw_entry: str | None = None) -> str:
     """Render a token stream as a readable expression.
 
     A ``%`` binds to the number in front of it, so it is never separated by a
-    space.
+    space. When ``raw_entry`` is given it replaces the final number, so the
+    text the user is still typing (for example ``0.``) is shown verbatim.
     """
     parts: list[str] = []
-    for token in tokens:
+    for index, token in enumerate(tokens):
+        is_last = index == len(tokens) - 1
         if token.kind is TokenKind.PERCENT:
             if parts:
                 parts[-1] = f"{parts[-1]}%"
@@ -320,21 +334,28 @@ def format_tokens(tokens: Sequence[Token]) -> str:
                 parts.append("%")
             continue
         if token.kind is TokenKind.NUMBER:
-            parts.append(format_number(token.value or Decimal(0)))
+            if is_last and raw_entry is not None:
+                parts.append(format_entry(raw_entry))
+            else:
+                parts.append(format_number(token.value or Decimal(0)))
         else:
             parts.append(OPERATOR_SYMBOL[token.op.value])
     return " ".join(parts)
 
 
 def parse_entry(raw: str) -> Decimal:
-    """Parse raw user input into a decimal number."""
+    """Parse raw user input into a number.
+
+    The value is routed through an IEEE-754 double first, exactly like the
+    browser's ``Number(raw)``, so both engines start from the same number.
+    """
     try:
         value = Decimal(raw)
     except InvalidOperation:
         return Decimal(0)
     if not value.is_finite():
         return Decimal(0)
-    return clean_number(value)
+    return clean_number(_to_double(value))
 
 
 # ---------------------------------------------------------------------------
@@ -370,11 +391,13 @@ class _Parser:
 
     def _parse_expression(self) -> Decimal:
         left = self._parse_term(None, None)
+
         while self._peek_operator(Operator.ADD, Operator.SUB):
             op = self._tokens[self._index].op
             self._index += 1
             right = self._parse_term(op, left)
-            left = apply_operator(op, left, right)
+            left = _to_double(apply_operator(op, left, right))
+
         return left
 
     def _parse_term(self, percent_base, percent_base_value) -> Decimal:
@@ -383,7 +406,7 @@ class _Parser:
             op = self._tokens[self._index].op
             self._index += 1
             right = self._parse_factor(None, None)
-            left = apply_operator(op, left, right)
+            left = _to_double(apply_operator(op, left, right))
         return left
 
     def _parse_factor(self, percent_base, percent_base_value) -> Decimal:
@@ -396,10 +419,14 @@ class _Parser:
         while self._index < len(self._tokens) and self._tokens[self._index].kind is TokenKind.PERCENT:
             self._index += 1
             if percent_base in (Operator.ADD, Operator.SUB):
+                # Relative to the accumulated value: `200 + 10%` -> 200 + 20.
                 base = percent_base_value if percent_base_value is not None else Decimal(0)
-                value = base * (value / Decimal(100))
+                hundredth = _to_double(value / Decimal(100))
+                value = _to_double(base * hundredth)
             else:
-                value = value / Decimal(100)
+                # Relative to 100: `200 x 10%` -> 200 x 0.1.
+                value = _to_double(value / Decimal(100))
+            # A second `%` would no longer see the original base.
             percent_base = None
             percent_base_value = None
         return value
@@ -531,6 +558,22 @@ def calculator_reducer(state: CalculatorState, action: CalculatorAction) -> Calc
     if action_type == "operator":
         if state.error:
             return _initial_state()
+
+        # A leading minus starts a negative number, the way a physical
+        # calculator does — otherwise "- 5" would silently read as "5".
+        if (
+            not state.tokens
+            and state.entry is None
+            and not state.just_evaluated
+            and action.op is Operator.SUB
+        ):
+            return CalculatorState(
+                entry="-",
+                last_operator=None,
+                last_operand=None,
+                last_operand_percent=False,
+            )
+
         assert action.op is not None
         tokens = list(state.tokens)
         entry = state.entry
@@ -706,7 +749,8 @@ def calculator_reducer(state: CalculatorState, action: CalculatorAction) -> Calc
 
     if action_type == "backspace":
         if state.error:
-            return state.copy()
+            # Backspace dismisses the error and returns to an empty display.
+            return CalculatorState()
         if state.just_evaluated:
             return _initial_state()
 
@@ -739,7 +783,8 @@ def calculator_reducer(state: CalculatorState, action: CalculatorAction) -> Calc
 
     if action_type == "clear-entry":
         if state.error:
-            return state.copy()
+            # Clear entry dismisses the error and returns to an empty display.
+            return CalculatorState()
         if state.just_evaluated:
             return _initial_state()
 
@@ -774,10 +819,17 @@ def calculator_reducer(state: CalculatorState, action: CalculatorAction) -> Calc
 
     if action_type == "toggle-sign":
         if state.error:
-            return state.copy()
+            # Any input dismisses the error and returns to an empty display.
+            return CalculatorState()
 
         if state.entry is not None:
-            entry = state.entry[1:] if state.entry.startswith("-") else f"-{state.entry}"
+            # Toggling the sign off a lone "-" leaves nothing behind.
+            if state.entry == "-":
+                entry = None
+            elif state.entry.startswith("-"):
+                entry = state.entry[1:]
+            else:
+                entry = f"-{state.entry}"
             return CalculatorState(
                 tokens=list(state.tokens),
                 entry=entry,
@@ -785,7 +837,7 @@ def calculator_reducer(state: CalculatorState, action: CalculatorAction) -> Calc
                 just_evaluated=state.just_evaluated,
                 last_expression=state.last_expression,
                 last_operator=state.last_operator,
-                last_operand=parse_entry(entry),
+                last_operand=parse_entry(entry) if entry is not None else None,
                 last_operand_percent=False,
             )
 
@@ -872,7 +924,7 @@ def derive_display(state: CalculatorState) -> dict[str, str | None]:
     tokens = list(state.tokens)
     if state.entry is not None:
         tokens.append(Token.number(state.entry))
-    expression = format_tokens(tokens)
+    expression = format_tokens(tokens, state.entry)
     evaluable = strip_trailing_operator(tokens)
 
     outcome: Decimal | None = None

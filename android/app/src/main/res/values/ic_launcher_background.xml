@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- The adaptive icon background: the app's graphite surface. -->
+    <color name="ic_launcher_background">#0a0b0d</color>
 </resources>
