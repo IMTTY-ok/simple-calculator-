@@ -210,6 +210,9 @@ store-assets/
 privacy-policy.html                        publish this on a public HTTPS page
 ```
 
+The `.aab` and `.apk` are build outputs and are not kept in git. Rebuild
+them with `npm run android:aab` and `npm run android:apk`.
+
 Start with **`release/PLAY_STORE_GUIDE.md`** — it walks through creating the
 developer account, filling in the listing, publishing the privacy policy,
 answering the declarations and submitting for review, in plain language.
