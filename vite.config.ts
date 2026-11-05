@@ -36,6 +36,13 @@ export default defineConfig(({ mode }) => {
   const isAndroid = mode === 'android'
 
   return {
+    // The Android build directory is large and changes on every Gradle run.
+    // Watching it makes the dev server reload for files it does not serve.
+    server: {
+      watch: {
+        ignored: ['**/android/**/build/**', '**/release/*.aab', '**/release/*.apk'],
+      },
+    },
     plugins: [
       react(),
       tailwindcss(),
